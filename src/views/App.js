@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import DefaultLayout from "./layouts/DefaultLayout";
 import AddStudent from "./components/AddStudent";
 import ListStudent from "./components/ListStudent";
+import PrivateRoute from './router/PrivateRoute';
 
 function App() {
     return (
@@ -34,7 +35,7 @@ function App() {
                         <ListStudent />
                     </DefaultLayout>
                 </Route> */}
-                <Route path="/">
+                <PrivateRoute path="/">
                     <DefaultLayout>
                         <Switch>
                             <Route path="/add-student">
@@ -45,7 +46,7 @@ function App() {
                             </Route>
                         </Switch>
                     </DefaultLayout>
-                </Route>
+                </PrivateRoute>
             </Switch>
         </Router>
     );

@@ -1,7 +1,18 @@
 import React, { Component } from "react";
-import { Form, Input, Button, Checkbox, Typography, Card } from "antd";
-import { login } from '../../actions/userActions';
-import { connect } from 'react-redux';
+import {
+    Form,
+    Input,
+    Button,
+    Checkbox,
+    Typography,
+    Card,
+    Spin,
+    Alert,
+} from "antd";
+import { login } from "../../actions/userActions";
+import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import { Redirect } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -21,15 +32,47 @@ const tailLayout = {
 };
 
 class LoginPage extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            err: "",
+        };
+    }
+
     onFinish = (data) => {
         console.log("Finish: ", data);
-        this.props.login(data).then(data => {
-            console.log("DATA", data)
-        })
-    }
+        this.setState({ loading: true });
+        this.props
+            .login(data)
+            .then((res) => {
+                this.setState({ loading: false });
+                if (res.data.token) {
+                    // redirect homepage
+                    // window.location.href = "/";
+                    this.props.history.push("/");
+                }
+            })
+            .catch((err) => {
+                this.setState({ err: err.response.data.err, loading: false });
+            });
+    };
+
     render() {
-        return (
-            <Card title={<Text underline>Login</Text>} style={{ width: 600, textAlign: "center", margin: "50px auto" }}>
+        const { loading, err } = this.state;
+        return this.props.isLoggedIn ? (
+            <Redirect to="/" />
+        ) : (
+            <Card
+                title={<Text underline>Login</Text>}
+                style={{ width: 600, textAlign: "center", margin: "50px auto" }}
+            >
+                <Text
+                    style={{ display: "inline-block", marginBottom: "10px" }}
+                    type="danger"
+                >
+                    {err}
+                </Text>
                 <Form
                     {...layout}
                     name="basic"
@@ -74,8 +117,12 @@ class LoginPage extends Component {
                     </Form.Item>
 
                     <Form.Item {...tailLayout}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            disabled={loading}
+                        >
+                            {loading ? <Spin /> : "Submit"}
                         </Button>
                     </Form.Item>
                 </Form>
@@ -84,4 +131,10 @@ class LoginPage extends Component {
     }
 }
 
-export default connect(null, { login })(LoginPage);
+function mapStateToProps(state) {
+    return {
+        isLoggedIn: state.user.isLoggedIn,
+    };
+}
+
+export default withRouter(connect(mapStateToProps, { login })(LoginPage));

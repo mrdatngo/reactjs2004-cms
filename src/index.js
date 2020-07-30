@@ -5,7 +5,14 @@ import App from "./views/App";
 import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import { Provider } from "react-redux";
-import store from './store'
+import store from './store';
+import { LOGGIN } from './constants/ActionsType';
+
+console.log("STARTING PROJECT");
+let token = localStorage.getItem("token");
+if (token) {
+    store.dispatch({ type: LOGGIN })
+}
 
 ReactDOM.render(
     <Provider store={store}>
